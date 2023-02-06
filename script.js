@@ -1,41 +1,68 @@
-//https://superheroapi.com/api/477042714621911/id
+const SUPERHERO_TOKEN = '10223569763528853';
+const BASE_URL = `https://superheroapi.com/api.php/${SUPERHERO_TOKEN}`;
 
-const superHeroToken = '477042714621911';
-const baseURL = `https://superheroapi.com/api.php/${superHeroToken}`;
-const Button = document.getElementById('button');
-const nameOfHero = document.getElementById('name');
-const SearchDiv = document.getElementById('search');
+const newHeroButton = document.getElementById('newHeroButton');
 
-const getSuperHero = (id) => {
-	let img;
-	fetch(`${baseURL}/${id}`)
+const heroImageDiv = document.getElementById('heroImage');
+
+const searchButton = document.getElementById('searchButton');
+
+const searchInput = document.getElementById('searchInput');
+
+const getSuperHero = (id, name) => {
+	// name 👉 base_url/search/batman
+	// json.results[0].image.url
+	// id: 👉 base_url/id
+	// json.image.url
+	fetch(`${BASE_URL}/${id}`)
 		.then((response) => response.json())
 		.then((json) => {
-			console.log(json);
-
-			document.querySelector(
-				'.new'
-			).innerHTML = `<img src="${json.image.url}" height="200" width="200"/>`;
+			console.log(json.powerstats);
+			const superHero = json;
+			showHeroInfo(superHero);
 		});
 };
-const getSuperHeroByName = (name) => {
-	let img;
-	fetch(`${baseURL}/search/${name}`)
+
+const statToEmoji = {
+	intelligence: '🧠',
+	strength: '💪',
+	speed: '⚡',
+	durability: '🏋️‍♂️',
+	power: '📊',
+	combat: '⚔️',
+};
+
+const showHeroInfo = (character) => {
+	const name = `<h2>${character.name}</h2>`;
+
+	const img = `<img src="${character.image.url}" height=200 width=200/>`;
+
+	const stats = Object.keys(character.powerstats)
+		.map((stat) => {
+			return `<p>${statToEmoji[stat]} ${stat.toUpperCase()}: ${
+				character.powerstats[stat]
+			}</p>`;
+		})
+		.join('');
+
+	heroImageDiv.innerHTML = `${name}${img}${stats}`;
+};
+
+const getSearchSuperHero = (name) => {
+	console.log(searchInput.value);
+	fetch(`${BASE_URL}/search/${name}`)
 		.then((response) => response.json())
 		.then((json) => {
-			console.log(json);
-
-			document.querySelector(
-				'.new'
-			).innerHTML = `<img src="${json.results[0].image.url}" height="200" width="200"/> <h1>${json.results[0].biography.publisher}</h1>`;
+			const hero = json.results[0];
+			showHeroInfo(hero);
 		});
 };
-SearchDiv.onclick = () => {
-	const name = nameOfHero.value;
-	getSuperHeroByName(name);
+
+const randomHero = () => {
+	const numberOfHeroes = 731;
+	return Math.floor(Math.random() * numberOfHeroes) + 1;
 };
 
-Button.addEventListener('click', () => {
-	console.log('click');
-	getSuperHero(Math.floor(Math.random() * 700 + 1));
-});
+newHeroButton.onclick = () => getSuperHero(randomHero());
+
+searchButton.onclick = () => getSearchSuperHero(searchInput.value);
