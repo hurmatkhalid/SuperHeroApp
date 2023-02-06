@@ -10,10 +10,6 @@ const searchButton = document.getElementById('searchButton');
 const searchInput = document.getElementById('searchInput');
 
 const getSuperHero = (id, name) => {
-	// name 👉 base_url/search/batman
-	// json.results[0].image.url
-	// id: 👉 base_url/id
-	// json.image.url
 	fetch(`${BASE_URL}/${id}`)
 		.then((response) => response.json())
 		.then((json) => {
